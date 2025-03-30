@@ -1,5 +1,6 @@
 # model/Pea.py
 import pygame
+from .Image import Image
 # from .Position import Position
 
 class Pea:
@@ -7,7 +8,7 @@ class Pea:
         self.position = position
         self.damage = damage
         self.speed = 5
-        self.image = pygame.transform.scale(pygame.image.load("assets/images/pea.webp"),(50,50))
+        self.image = Image.pea
     
     def draw(self, screen):
         screen.blit(self.image, (self.position.x + 50, self.position.y + 15))
