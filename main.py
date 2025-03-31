@@ -58,7 +58,7 @@ plantList = []
 peaList = []
 selected_plant = None
 #-----state variables---------#
-zombieBornRate = 5000
+zombieBornRate = 10000
 zombieHealth = 150
 
 # ----Time---------
@@ -179,7 +179,7 @@ while running:
             for zombie in zombieList[:]:
                 if zombie.position.x + 50 <= Eviron.position.startx:
                     game_over = True  # Set game-over state instead of quitting
-                
+        
                 zombie_rect = zombie.get_rect()
                 if pea_rect.colliderect(zombie_rect):
                     zombie.take_damage(pea.damage)
@@ -207,7 +207,7 @@ while running:
         for zombie in zombieList[:]:
             zombie_is_colliding = False
             zombie_rect = zombie.get_rect()
-            
+ 
             for plant in plantList[:]:
                 plant_rect = plant.image.get_rect(topleft=(plant.position.x, plant.position.y))
                 if zombie_rect.colliderect(plant_rect):
@@ -215,7 +215,7 @@ while running:
                     if zombie.attack(current_time, plant):
                         plantList.remove(plant)
                     break
-            
+
             if not zombie_is_colliding:
                 zombie.move()
             zombie.draw(screen)

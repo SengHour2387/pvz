@@ -54,7 +54,7 @@ class WallNut(Plant):
 class Sunflower(Plant):
     def __init__(self, id, price, position, image, health=100):
         super().__init__(id, price, position, image, health)
-        self.sun_rate = 2  # Generate sun every 2 seconds
+        self.sun_rate = 3  # Generate sun every 3 seconds
         self.last_sun = 0  # Track last sun generation time
         self.sun_value = 25  # Amount of sun points generated
     

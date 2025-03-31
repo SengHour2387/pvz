@@ -8,7 +8,7 @@ class Zombie:
         self.attack_damage = 20  # Damage dealt to plants
         self.attack_rate = 1  # Attacks per second
         self.last_attack = 0  # Track last attack time
-    
+
     def draw(self, screen):
         screen.blit(self.image, (self.position.x, self.position.y))
         
@@ -20,7 +20,7 @@ class Zombie:
         
     def get_rect(self):
         return self.image.get_rect(topleft=(self.position.x, self.position.y))
-    
+        
     def attack(self, current_time, plant):
         # Attack plant if cooldown has passed
         if current_time - self.last_attack >= 2000 / self.attack_rate:
