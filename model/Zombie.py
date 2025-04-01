@@ -10,7 +10,7 @@ class Zombie:
         self.last_attack = 0  # Track last attack time
 
     def draw(self, screen):
-        screen.blit(self.image, (self.position.x, self.position.y))
+        screen.blit(self.image, (self.position.x, self.position.y+40))
         
     def move(self):
         self.position.x -= self.speed 
