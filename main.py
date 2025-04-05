@@ -55,7 +55,7 @@ selected_plant = None
 
 zombieBornRate = 10000
 zombieHealth = 150
-sun_rate = 3
+sun_rate = 4
 lastFrame = pygame.time.get_ticks()
 
 # Define functions before the game loop
@@ -147,7 +147,8 @@ while running:
         
         sun_text = font.render(f"Sun: {sun_points}", True, (255, 200, 0))
         screen.blit(sun_text, (300, 60))
-        
+        zomebie_text = font.render(f"Zombie Health: {zombieHealth}", True, (0, 200, 0))
+        screen.blit(zomebie_text, (800, 60))
         kill_text = font.render(f"Kills: {kill_count}", True, (200, 0, 0))
         screen.blit(kill_text, (1150, 60))
         
@@ -155,7 +156,8 @@ while running:
 
         for plant in plantList[:]:
             plant.draw(screen)
-            action_result = plant.shoot(current_time)
+            action_result = plant.shoot(current_time,sun_rate)
+        
             if action_result is not None:
                 if isinstance(action_result, int):
                     sun_points += action_result
@@ -179,29 +181,33 @@ while running:
                         kill_count += 1
                         if kill_count == 1:
                             sun_rate = 5
-                        if kill_count == 5:
-                            sun_rate = 8
+                        if kill_count == 2:
+                            sun_rate = 10
                             zombieBornRate = 8000
                             zombieHealth = 200
-                        if kill_count == 10:
-                            sun_rate = 10
-                            zombieBornRate = 6000
-                            zombieHealth = 220
-                        if kill_count == 15:
-                            sun_rate = 12
-                            zombieHealth = 230
-                            zombieBornRate = 5000
-                        if kill_count == 20:
+                        if kill_count == 3:
                             sun_rate = 15
                             zombieHealth = 250
-                        if kill_count == 25:
+                            zombieBornRate = 7000
+                        if kill_count == 10:
+                            sun_rate = 18
+                            zombieBornRate = 6000
+                            zombieHealth = 320
+                        if kill_count == 15:
                             sun_rate = 20
+                            zombieHealth = 350
+                            zombieBornRate = 5000
+                        if kill_count == 20:
+                            sun_rate = 25
+                            zombieHealth = 380
+                        if kill_count == 25:
+                            sun_rate = 25
                             zombieBornRate = 4000
-                            zombieHealth = 270
+                            zombieHealth = 410
                         if kill_count == 30:
                             sun_rate = 25	
                             zombieBornRate = 3000
-                            zombieHealth = 320
+                            zombieHealth = 450
                             
                     break
             else:

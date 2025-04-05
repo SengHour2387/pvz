@@ -41,7 +41,7 @@ class PeaShooter(Plant):
     def draw(self, screen):
         super().draw(screen)
     
-    def shoot(self, current_time):
+    def shoot(self, current_time,sunRate):
         if current_time - self.last_shot >= 1000 / self.fire_rate:
             pea_position = copy.deepcopy(self.position)
             bullet = Pea(position=pea_position, damage=self.damage)
@@ -56,7 +56,7 @@ class WallNut(Plant):
     def draw(self, screen):
         super().draw(screen)
     
-    def shoot(self, current_time):
+    def shoot(self, current_time,sunRate):
         return None
 
 class Sunflower(Plant):
@@ -69,8 +69,8 @@ class Sunflower(Plant):
     def draw(self, screen):
         super().draw(screen)
     
-    def shoot(self, current_time):
-        if current_time - self.last_sun >= 1000 * self.sun_rate:
+    def shoot(self, current_time,sunRate):
+        if current_time - self.last_sun >= 1000 * sunRate:
             self.last_sun = current_time
             return self.sun_value
         return None
