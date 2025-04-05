@@ -7,7 +7,7 @@ class Pea:
     def __init__(self, position, damage):
         self.position = position
         self.damage = damage
-        self.speed = 5
+        self.speed = 3
         self.image = Image.pea
     
     def draw(self, screen):

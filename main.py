@@ -9,7 +9,7 @@ from model.Image import Image
 pygame.init()
 screen = pygame.display.set_mode((1300, 700))
 running = True
-game_over = False  # Add game-over state
+game_over = False
 
 # Load images from Image class
 Image.load_images()
@@ -19,10 +19,8 @@ icon = pygame.image.load('assets/icons/pvzIcon.png')
 pygame.display.set_icon(icon)
 pygame.display.set_caption('Plants vs Zombies')
 
-# background
 grassField = pygame.image.load("assets/images/worldblur.png")
 
-# Grid settings
 GRID_ROWS = 6
 GRID_COLS = 9
 CELL_WIDTH = 1152 // GRID_COLS
@@ -30,40 +28,37 @@ CELL_HEIGHT = 520 // GRID_ROWS
 GRID_OFFSET_X = 1300 - 1152
 GRID_OFFSET_Y = 700 - 520
 
-# Store settings
 STORE_HEIGHT = 100
-store_peashooter = pygame.transform.scale(Image.peaShooter, (60, 90))
-store_sunflower = pygame.transform.scale(Image.sunflower, (60, 90))
+store_peashooter = pygame.transform.scale(Image.peaShooter.current_frame, (60, 90))
+store_sunflower = pygame.transform.scale(Image.sunflower.current_frame, (60, 90))
 store_wallnut = pygame.transform.scale(Image.wallnute, (60, 90))
 store_rect_peashooter = pygame.Rect(50, 20, 60, 90)
 store_rect_sunflower = pygame.Rect(120, 20, 60, 90)
 store_rect_wallnut = pygame.Rect(190, 20, 60, 90)
 
-# Game resources
 sun_points = 50
 kill_count = 0
 font = pygame.font.Font(None, 36)
 
-# High score handling
 try:
     with open("highscore.txt", "r") as file:
         high_score = int(file.read().strip())
 except (FileNotFoundError, ValueError):
-    high_score = 0  # Default to 0 if file doesn't exist or is invalid
+    high_score = 0
 
 ROW_POSITIONS = [43, 130, 217, 303, 390, 477]
-# --------object-----
+
 zombieList = []
 plantList = []
 peaList = []
 selected_plant = None
-#-----state variables---------#
+
 zombieBornRate = 10000
 zombieHealth = 150
-
-# ----Time---------
+sun_rate = 3
 lastFrame = pygame.time.get_ticks()
 
+# Define functions before the game loop
 def draw_grid():
     for row in range(GRID_ROWS + 1):
         pygame.draw.line(screen, (200, 200, 200), 
@@ -98,11 +93,13 @@ def reset_game():
     plantList = []
     peaList = []
     selected_plant = None
-    zombieBornRate = 5000
+    zombieBornRate = 10000
     zombieHealth = 150
     lastFrame = pygame.time.get_ticks()
 
-# game loop
+clock = pygame.time.Clock()
+
+# Game loop
 while running:
     current_time = pygame.time.get_ticks()
     
@@ -113,11 +110,11 @@ while running:
             mouse_pos = pygame.mouse.get_pos()
             if store_rect_peashooter.collidepoint(mouse_pos) and sun_points >= 100:
                 selected_plant = PeaShooter(1, 100, Position(mouse_pos[0], mouse_pos[1]), 
-                                          pygame.transform.scale(Image.peaShooter, (50, 80)))
+                                          pygame.transform.scale(Image.peaShooter.current_frame, (50, 80)))
                 sun_points -= 100
             elif store_rect_sunflower.collidepoint(mouse_pos) and sun_points >= 50:
                 selected_plant = Sunflower(1, 50, Position(mouse_pos[0], mouse_pos[1]), 
-                                         pygame.transform.scale(Image.sunflower, (50, 80)))
+                                         pygame.transform.scale(Image.sunflower.current_frame, (50, 80)),sun_rate)
                 sun_points -= 50
             elif store_rect_wallnut.collidepoint(mouse_pos) and sun_points >= 50:
                 selected_plant = WallNut(1, 50, Position(mouse_pos[0], mouse_pos[1]), 
@@ -141,27 +138,21 @@ while running:
                 game_over = False
 
     if not game_over:
-        # Fill background
-        screen.fill((165, 255, 255))
         screen.blit(grassField, (0, 0))
+        screen.fill((165, 255, 255), (0, 0, 1300, STORE_HEIGHT))
         
-        # Draw store area
         screen.blit(store_peashooter, (50, 20))
         screen.blit(store_sunflower, (120, 20))
         screen.blit(store_wallnut, (190, 20))
         
-        # Draw sun points
         sun_text = font.render(f"Sun: {sun_points}", True, (255, 200, 0))
         screen.blit(sun_text, (300, 60))
         
-        # Draw kill count in top right
         kill_text = font.render(f"Kills: {kill_count}", True, (200, 0, 0))
         screen.blit(kill_text, (1150, 60))
         
-        # Draw game area
         draw_grid()
 
-        # Draw placed plants and handle their actions
         for plant in plantList[:]:
             plant.draw(screen)
             action_result = plant.shoot(current_time)
@@ -171,14 +162,13 @@ while running:
                 elif hasattr(action_result, 'draw'):
                     peaList.append(action_result)
         
-        # Handle peas
         for pea in peaList[:]:
             pea.draw(screen)
             pea.move()
             pea_rect = pea.get_rect()
             for zombie in zombieList[:]:
                 if zombie.position.x + 50 <= Eviron.position.startx:
-                    game_over = True  # Set game-over state instead of quitting
+                    game_over = True
         
                 zombie_rect = zombie.get_rect()
                 if pea_rect.colliderect(zombie_rect):
@@ -187,55 +177,73 @@ while running:
                     if zombie.health <= 0:
                         zombieList.remove(zombie)
                         kill_count += 1
-                        if kill_count == 15:
-                            zombieBornRate = 3000
-                        if kill_count == 30:
+                        if kill_count == 1:
+                            sun_rate = 5
+                        if kill_count == 5:
+                            sun_rate = 8
+                            zombieBornRate = 8000
+                            zombieHealth = 200
+                        if kill_count == 10:
+                            sun_rate = 10
+                            zombieBornRate = 6000
                             zombieHealth = 220
-                            zombieBornRate = 1000
+                        if kill_count == 15:
+                            sun_rate = 12
+                            zombieHealth = 230
+                            zombieBornRate = 5000
+                        if kill_count == 20:
+                            sun_rate = 15
+                            zombieHealth = 250
+                        if kill_count == 25:
+                            sun_rate = 20
+                            zombieBornRate = 4000
+                            zombieHealth = 270
+                        if kill_count == 30:
+                            sun_rate = 25	
+                            zombieBornRate = 3000
+                            zombieHealth = 320
+                            
                     break
             else:
                 if pea.position.x > Eviron.position.endx:
                     peaList.remove(pea)
 
-        # Draw selected plant following mouse
         if selected_plant:
             mouse_x, mouse_y = pygame.mouse.get_pos()
             selected_plant.position = Position(mouse_x - 40, mouse_y - 60)
             selected_plant.draw(screen)
 
-        # Handle zombies and plant interactions
         for zombie in zombieList[:]:
             zombie_is_colliding = False
             zombie_rect = zombie.get_rect()
  
             for plant in plantList[:]:
-                plant_rect = plant.image.get_rect(topleft=(plant.position.x, plant.position.y))
+                plant_rect = plant.get_rect()
                 if zombie_rect.colliderect(plant_rect):
                     zombie_is_colliding = True
+                    zombie.setImage(Image.zoombieEat)
                     if zombie.attack(current_time, plant):
                         plantList.remove(plant)
                     break
 
             if not zombie_is_colliding:
+                zombie.setImage(Image.zoombie)
                 zombie.move()
             zombie.draw(screen)
 
-        # ----------spawning----------
         if current_time - lastFrame > zombieBornRate:
             row_y = random.choice(ROW_POSITIONS)
             zombieList.append(
                 Zombie(1, Image.zoombie, Position(x=Eviron.position.endx, y=Eviron.setEnviLocY(Eviron(), row_y - 120)), zombieHealth))
             lastFrame = current_time
 
-    else:  # Game over state
-        # Update high score if current kill count is higher
+    else:
         if kill_count > high_score:
             high_score = kill_count
             with open("highscore.txt", "w") as file:
                 file.write(str(high_score))
 
-        # Draw game over screen
-        screen.fill((0, 0, 0))  # Black background
+        screen.fill((0, 0, 0))
         game_over_text = font.render("Game Over!", True, (255, 0, 0))
         restart_text = font.render("Press SPACE to Restart", True, (255, 255, 255))
         score_text = font.render(f"Score: {kill_count}", True, (255, 255, 0))
@@ -247,6 +255,6 @@ while running:
         screen.blit(high_score_text, (550, 500))
 
     pygame.display.update()
-    pygame.time.Clock().tick(60)
+    clock.tick(60)
 
 pygame.quit()

@@ -1,4 +1,3 @@
-# model/Plant.py
 from .Pea import Pea
 import pygame
 import copy
@@ -8,11 +7,22 @@ class Plant:
         self.id = id
         self.price = price
         self.position = position
-        self.image = image
+        self.image = image  # Can be pygame.Surface or AnimatedImage
         self.health = health
     
     def draw(self, screen):
-        screen.blit(self.image, (self.position.x, self.position.y))
+        # Check if image is a Surface or AnimatedImage
+        if isinstance(self.image, pygame.Surface):
+            screen.blit(self.image, (self.position.x, self.position.y))
+        else:  # AnimatedImage
+            screen.blit(self.image.current_frame, (self.position.x, self.position.y))
+    
+    def get_rect(self):
+        # Return rect based on image type
+        if isinstance(self.image, pygame.Surface):
+            return self.image.get_rect(topleft=(self.position.x, self.position.y))
+        else:  # AnimatedImage
+            return self.image.current_frame.get_rect(topleft=(self.position.x, self.position.y))
     
     def take_damage(self, damage):
         self.health -= damage
@@ -32,7 +42,6 @@ class PeaShooter(Plant):
         super().draw(screen)
     
     def shoot(self, current_time):
-        # Implement a firing cooldown based on fire_rate
         if current_time - self.last_shot >= 1000 / self.fire_rate:
             pea_position = copy.deepcopy(self.position)
             bullet = Pea(position=pea_position, damage=self.damage)
@@ -41,20 +50,19 @@ class PeaShooter(Plant):
         return None
 
 class WallNut(Plant):
-    def __init__(self, id, price, position, image, health=400):  # Higher health as a defensive plant
+    def __init__(self, id, price, position, image, health=400):
         super().__init__(id, price, position, image, health)
     
     def draw(self, screen):
         super().draw(screen)
     
     def shoot(self, current_time):
-        # WallNut doesn't shoot, so always return None
         return None
 
 class Sunflower(Plant):
-    def __init__(self, id, price, position, image, health=100):
+    def __init__(self, id, price, position, image, sun_rate,health=100):
         super().__init__(id, price, position, image, health)
-        self.sun_rate = 3  # Generate sun every 3 seconds
+        self.sun_rate = sun_rate # Generate sun every 5 seconds
         self.last_sun = 0  # Track last sun generation time
         self.sun_value = 25  # Amount of sun points generated
     
@@ -62,8 +70,7 @@ class Sunflower(Plant):
         super().draw(screen)
     
     def shoot(self, current_time):
-        # Sunflower generates sun instead of shooting
         if current_time - self.last_sun >= 1000 * self.sun_rate:
             self.last_sun = current_time
-            return self.sun_value  # Return sun points instead of a bullet
+            return self.sun_value
         return None
