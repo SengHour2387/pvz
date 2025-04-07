@@ -54,7 +54,7 @@ peaList = []
 selected_plant = None
 
 zombieBornRate = 10000
-zombieHealth = 150
+zombieHealth = 100
 sun_rate = 4
 lastFrame = pygame.time.get_ticks()
 
@@ -139,7 +139,7 @@ while running:
 
     if not game_over:
         screen.blit(grassField, (0, 0))
-        screen.fill((165, 255, 255), (0, 0, 1300, STORE_HEIGHT))
+        # screen.fill((165, 255, 255), (0, 0, 1300, STORE_HEIGHT))
         
         screen.blit(store_peashooter, (50, 20))
         screen.blit(store_sunflower, (120, 20))
@@ -147,6 +147,8 @@ while running:
         
         sun_text = font.render(f"Sun: {sun_points}", True, (255, 200, 0))
         screen.blit(sun_text, (300, 60))
+        high_score_text = font.render(f"High Score: {high_score}", True, (255, 200, 0))
+        screen.blit(high_score_text, (550, 60))
         zomebie_text = font.render(f"Zombie Health: {zombieHealth}", True, (0, 200, 0))
         screen.blit(zomebie_text, (800, 60))
         kill_text = font.render(f"Kills: {kill_count}", True, (200, 0, 0))
@@ -171,7 +173,7 @@ while running:
             for zombie in zombieList[:]:
                 if zombie.position.x + 50 <= Eviron.position.startx:
                     game_over = True
-        
+
                 zombie_rect = zombie.get_rect()
                 if pea_rect.colliderect(zombie_rect):
                     zombie.take_damage(pea.damage)
@@ -179,36 +181,41 @@ while running:
                     if zombie.health <= 0:
                         zombieList.remove(zombie)
                         kill_count += 1
+                        
                         if kill_count == 1:
                             sun_rate = 5
+                            
                         if kill_count == 2:
                             sun_rate = 10
                             zombieBornRate = 8000
                             zombieHealth = 200
+                            
                         if kill_count == 3:
                             sun_rate = 15
                             zombieHealth = 250
                             zombieBornRate = 7000
+                            
                         if kill_count == 10:
                             sun_rate = 18
                             zombieBornRate = 6000
                             zombieHealth = 320
+                            
                         if kill_count == 15:
-                            sun_rate = 20
+                            sun_rate = 18
                             zombieHealth = 350
                             zombieBornRate = 5000
-                        if kill_count == 20:
-                            sun_rate = 25
-                            zombieHealth = 380
-                        if kill_count == 25:
-                            sun_rate = 25
-                            zombieBornRate = 4000
-                            zombieHealth = 410
-                        if kill_count == 30:
-                            sun_rate = 25	
-                            zombieBornRate = 3000
-                            zombieHealth = 450
                             
+                        if kill_count == 20:
+                            zombieHealth = 380
+                            
+                        if kill_count == 25:
+                            sun_rate = 10
+                            zombieBornRate = 2500
+                            zombieHealth = 400
+                            
+                        if kill_count == 30:
+                            sun_rate = 7
+                            zombieBornRate = 1000
                     break
             else:
                 if pea.position.x > Eviron.position.endx:

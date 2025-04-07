@@ -29,9 +29,13 @@ class Zombie:
     def get_rect(self):
         # Return rect based on image type
         if isinstance(self.image, pygame.Surface):
-            return self.image.get_rect(topleft=(self.position.x, self.position.y))
+            rect  = self.image.get_rect(topleft=(self.position.x, self.position.y))
+            rect.height = 60
+            return rect
         else:  # AnimatedImage
-            return self.image.current_frame.get_rect(topleft=(self.position.x, self.position.y))
+            rect = self.image.current_frame.get_rect(topleft=(self.position.x, self.position.y + 40))
+            rect.height = 60
+            return rect
         
     def setImage(self, image):
         self.image = image
